@@ -1,0 +1,61 @@
+name: Publish Docker Image
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+  schedule:
+    - cron: 0 0 1 * * # first of each month
+
+permissions: write-all
+concurrency:
+  group: publish-ci
+  cancel-in-progress: true
+
+jobs:
+  publish-images:
+    runs-on: ubuntu-latest
+    env:
+      NOW: ""
+    steps:
+      - name: ⚙️ Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: "master"
+          fetch-depth: 0
+
+      - name: ⌚ Time $NOW
+        run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: ⚙️ Get Short SHA
+        uses: hudsonm62/short-sha@v1
+        id: sha
+
+      - name: 🌐 Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🌐 Login to Docker Container Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: 🔧 Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🏗️ Build and Push with Cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/spotdl-gui:${{ env.NOW }}
+            ghcr.io/${{ github.repository_owner }}/spotdl-gui:${{ steps.sha.outputs.sha }}
+            ghcr.io/${{ github.repository_owner }}/spotdl-gui:latest
+            ${{ github.repository_owner }}/spotdl-gui:${{ env.NOW }}
+            ${{ github.repository_owner }}/spotdl-gui:${{ steps.sha.outputs.sha }}
+            ${{ github.repository_owner }}/spotdl-gui:latest

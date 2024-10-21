@@ -1,0 +1,10 @@
+services:
+  spotdl-gui:
+    build: .
+    restart: always
+    container_name: spotdl-gui
+    image: hudsonm62/spotdl-gui
+    ports:
+      - "8800:8800"
+    volumes:
+      - C:/Temp/Music:/music
