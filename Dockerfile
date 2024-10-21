@@ -29,5 +29,5 @@ RUN poetry install --no-cache --without dev --sync
 WORKDIR /music
 VOLUME /music
 
-EXPOSE 8080
-ENTRYPOINT ["poetry", "run", "spotdl", "web", "--host", "0.0.0.0", "--port", "8080"]
+EXPOSE 8800
+ENTRYPOINT ["poetry", "run", "spotdl", "web", "--host", "0.0.0.0", "--port", "8800"]
