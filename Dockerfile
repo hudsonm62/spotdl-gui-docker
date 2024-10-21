@@ -1,9 +1,9 @@
-FROM python:3.12-alpine3.20 AS dl
+FROM python:3.13-alpine3.20 AS dl
 
 RUN apk add --no-cache git && \
   git clone --single-branch https://github.com/spotDL/spotify-downloader.git
 
-FROM python:3.12-alpine3.20 AS run
+FROM python:3.13-alpine3.20 AS run
 ENV PYTHONOPTIMIZE=1
 
 # Install system dependencies
